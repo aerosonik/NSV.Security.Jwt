@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29509.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSV.Security.Jwt", "Jwt\NSV.Security.Jwt.csproj", "{1AD8A1AE-FF46-4EB6-83B7-9F8A4FDC1BE7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSV.Security.Jwt.UnitTests", "Jwt.UnitTests\NSV.Security.Jwt.UnitTests.csproj", "{9A05893E-2CF3-4E74-9E7B-965D16419E19}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1AD8A1AE-FF46-4EB6-83B7-9F8A4FDC1BE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AD8A1AE-FF46-4EB6-83B7-9F8A4FDC1BE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AD8A1AE-FF46-4EB6-83B7-9F8A4FDC1BE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AD8A1AE-FF46-4EB6-83B7-9F8A4FDC1BE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A05893E-2CF3-4E74-9E7B-965D16419E19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A05893E-2CF3-4E74-9E7B-965D16419E19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A05893E-2CF3-4E74-9E7B-965D16419E19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A05893E-2CF3-4E74-9E7B-965D16419E19}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {60ABD6B7-F2E0-4AE8-9917-6EDA403DD4D4}
+	EndGlobalSection
+EndGlobal
