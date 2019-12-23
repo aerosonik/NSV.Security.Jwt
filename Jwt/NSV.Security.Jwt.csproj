@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
@@ -6,12 +6,16 @@
     <RootNamespace>NSV.Security.JWT</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>NSV.Security.Jwt</PackageId>
-    <Authors>NSV.Security.Jwt</Authors>
-    <Company>NSV.Security.Jwt</Company>
+    <Authors>aerosonik</Authors>
+    <Company>NSV</Company>
     <Product>NSV.Security.Jwt</Product>
     <PackageProjectUrl>https://github.com/aerosonik/NSV.Security.Jwt</PackageProjectUrl>
     <RepositoryUrl>https://github.com/aerosonik/NSV.Security.Jwt</RepositoryUrl>
     <Copyright>aerosonik@nsv 2019</Copyright>
+    <PackageTags>jwt</PackageTags>
+    <PackageVersion></PackageVersion>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <FileVersion>1.0.0.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
