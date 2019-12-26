@@ -2,9 +2,9 @@
 
 namespace NSV.Security.JWT
 {
-    public static class JwtParameters
+    public static class JwtSettitngs
     {
-        internal static JwtOptions Options { get; set; }
+        internal static JwtOptions Options { get; set; } = new JwtOptions();
 
         public static TokenValidationParameters TokenValidationParameters()
         {
