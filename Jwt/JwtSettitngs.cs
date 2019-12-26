@@ -2,7 +2,7 @@
 
 namespace NSV.Security.JWT
 {
-    public static class JwtSettitngs
+    public static class JwtSettings
     {
         internal static JwtOptions Options { get; set; } = new JwtOptions();
 

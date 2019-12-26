@@ -13,7 +13,7 @@ namespace NSV.Security.JWT
             //serviceCollection.Configure<JwtOptions>(conf => conf = Jwt.Options);
             return serviceCollection.AddSingleton<IJwtService>(provider => 
             {
-                return new JwtService(JwtSettitngs.Options);
+                return new JwtService(JwtSettings.Options);
             });
         }
 
@@ -21,13 +21,13 @@ namespace NSV.Security.JWT
             this IServiceCollection serviceCollection,
             IConfiguration configuration)
         {
-            JwtSettitngs.Options = configuration
+            JwtSettings.Options = configuration
                 .GetSection(nameof(JwtOptions))
                 .Get<JwtOptions>();
             //serviceCollection.Configure<JwtOptions>(conf => conf = Jwt.Options);
             return serviceCollection.AddSingleton<IJwtService>(provider =>
             {
-                return new JwtService(JwtSettitngs.Options);
+                return new JwtService(JwtSettings.Options);
             });
         }
 
@@ -36,11 +36,11 @@ namespace NSV.Security.JWT
             Action<JwtOptions> configureOptions)
         {
             //JwtSettitngs.Options = new JwtOptions();
-            configureOptions.Invoke(JwtSettitngs.Options);
+            configureOptions.Invoke(JwtSettings.Options);
             //serviceCollection.Configure<JwtOptions>(conf => conf = Jwt.Options);
             return serviceCollection.AddSingleton<IJwtService>(provider =>
             {
-                return new JwtService(JwtSettitngs.Options);
+                return new JwtService(JwtSettings.Options);
             });
         }
     }
