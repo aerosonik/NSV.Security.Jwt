@@ -37,7 +37,7 @@ namespace NSV.Security.Jwt.UnitTests
 
             var identityOptions = new IdentityOptions();
             var accessClaims = new JwtSecurityTokenHandler()
-                    .ReadJwtToken(access.Tokens.AccessToken)
+                    .ReadJwtToken(access.Tokens.AccessToken.Value)
                     .Claims.ToArray();
             var accessId = accessClaims
                 .FirstOrDefault(x => x.Type
@@ -74,8 +74,8 @@ namespace NSV.Security.Jwt.UnitTests
 
             var refreshedAccess = jwtService
                 .RefreshAccessToken(
-                    access.Tokens.AccessToken,
-                    access.Tokens.RefreshToken);
+                    access.Tokens.AccessToken.Value,
+                    access.Tokens.RefreshToken.Value);
 
             Assert.True(refreshedAccess.Result == JwtTokenResult.TokenResult.Ok);
             Assert.NotNull(refreshedAccess.Tokens);
@@ -84,7 +84,7 @@ namespace NSV.Security.Jwt.UnitTests
 
             var identityOptions = new IdentityOptions();
             var accessClaims = new JwtSecurityTokenHandler()
-                    .ReadJwtToken(access.Tokens.AccessToken)
+                    .ReadJwtToken(access.Tokens.AccessToken.Value)
                     .Claims.ToArray();
             var accessId = accessClaims
                 .FirstOrDefault(x => x.Type
@@ -128,14 +128,14 @@ namespace NSV.Security.Jwt.UnitTests
 
                 var refreshedAccess = jwtService
                     .RefreshAccessToken(
-                        accessToken,
-                        access.Tokens.RefreshToken);
+                        accessToken.Value,
+                        access.Tokens.RefreshToken.Value);
 
                 Assert.True(refreshedAccess.Result == JwtTokenResult.TokenResult.Ok);
 
                 var identityOptions = new IdentityOptions();
                 var accessClaims = new JwtSecurityTokenHandler()
-                        .ReadJwtToken(refreshedAccess.Tokens.AccessToken)
+                        .ReadJwtToken(refreshedAccess.Tokens.AccessToken.Value)
                         .Claims.ToArray();
                 var accessId = accessClaims
                     .FirstOrDefault(x => x.Type
@@ -155,18 +155,18 @@ namespace NSV.Security.Jwt.UnitTests
                 {
                     Assert.Contains(role.Value, user.roles);
                 }
-                Assert.False(accessToken
-                    .Equals(refreshedAccess.Tokens.AccessToken));
+                Assert.False(accessToken.Value
+                    .Equals(refreshedAccess.Tokens.AccessToken.Value));
 
-                accessToken = refreshedAccess.Tokens.AccessToken;
+                accessToken.Value = refreshedAccess.Tokens.AccessToken.Value;
             }
 
             await Task.Delay(TimeSpan.FromSeconds(20));
 
             var unRefreshedAccess = jwtService
                     .RefreshAccessToken(
-                        accessToken,
-                        access.Tokens.RefreshToken);
+                        accessToken.Value,
+                        access.Tokens.RefreshToken.Value);
 
             Assert.True(unRefreshedAccess.Result == 
                 JwtTokenResult.TokenResult.RefreshTokenExpired);
@@ -187,8 +187,8 @@ namespace NSV.Security.Jwt.UnitTests
 
             var unRefreshedAccess = jwtService
                     .RefreshAccessToken(
-                        access.Tokens.AccessToken,
-                        access.Tokens.RefreshToken);
+                        access.Tokens.AccessToken.Value,
+                        access.Tokens.RefreshToken.Value);
 
             Assert.True(unRefreshedAccess.Result == 
                 JwtTokenResult.TokenResult.RefreshTokenExpired);
@@ -209,8 +209,8 @@ namespace NSV.Security.Jwt.UnitTests
 
             var unRefreshedAccess = jwtService
                     .RefreshAccessToken(
-                        access.Tokens.AccessToken,
-                        access.Tokens.RefreshToken);
+                        access.Tokens.AccessToken.Value,
+                        access.Tokens.RefreshToken.Value);
 
             Assert.True(unRefreshedAccess.Result ==
                 JwtTokenResult.TokenResult.Ok);

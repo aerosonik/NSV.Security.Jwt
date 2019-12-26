@@ -27,11 +27,10 @@ namespace NSV.Security.JWT
             string name,
             IEnumerable<string> roles)
         {
-            var model = new TokenModel
-            {
-                AccessToken = GetAccessToken(id, name, roles),
-                RefreshToken = GetRefreshToken(id, name)
-            };
+            var model = new TokenModel(
+                GetAccessToken(id, name, roles),
+                GetRefreshToken(id, name)
+            );
             return JwtTokenResult.Ok(model);
         }
 
@@ -76,22 +75,22 @@ namespace NSV.Security.JWT
                 .Equals(ClaimTypes.Role));
 
             var claims = GetAccessClaims(accessId, accessName, roles);
-            var token = CreateAccessToken(claims);
+            var newAccessToken = CreateAccessToken(claims);
 
             if (result.update)
-                return JwtTokenResult.Ok(
-                    new TokenModel
-                    {
-                        AccessToken = token,
-                        RefreshToken = GetRefreshToken(accessId, accessName)
-                    });
+            {
+                return JwtTokenResult.Ok(new TokenModel
+                (
+                    newAccessToken,
+                    GetRefreshToken(accessId, accessName)
+                ));
+            }
 
-            return JwtTokenResult.Ok(
-                    new TokenModel { AccessToken = token });
+            return JwtTokenResult.Ok(new TokenModel(newAccessToken));
         }
 
         #region private methods
-        private string GetRefreshToken(
+        private (string token, DateTime expiry) GetRefreshToken(
             string id,
             string name)
         {
@@ -99,7 +98,7 @@ namespace NSV.Security.JWT
             return CreateRefreshToken(claims);
         }
 
-        private string GetAccessToken(
+        private (string token, DateTime expiry) GetAccessToken(
             string id,
             string name,
             IEnumerable<string> roles)
@@ -108,34 +107,38 @@ namespace NSV.Security.JWT
             return CreateAccessToken(claims);
         }
 
-        private string CreateAccessToken(IEnumerable<Claim> claims)
+        private (string token, DateTime expiry) CreateAccessToken(
+            IEnumerable<Claim> claims)
         {
+            var expiry = DateTime.UtcNow.Add(_options.AccessTokenExpiry);
             var jwt = new JwtSecurityToken(
                 issuer: _options.ValidIssuer,
                 audience: _options.ValidAudience,
                 notBefore: DateTime.UtcNow,
                 claims: claims,
-                expires: DateTime.UtcNow.Add(_options.AccessTokenExpiry),
+                expires: expiry,
                 signingCredentials: new SigningCredentials(
                     new SymmetricSecurityKey(_options.AccessSecurityKeyBytes),
                     SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-            return encodedJwt;
+            var token = new JwtSecurityTokenHandler().WriteToken(jwt);
+            return (token, expiry);
         }
 
-        private string CreateRefreshToken(IEnumerable<Claim> claims)
+        private (string token, DateTime expiry) CreateRefreshToken(
+            IEnumerable<Claim> claims)
         {
+            var expiry = DateTime.UtcNow.Add(_options.RefreshTokenExpiry);
             var jwt = new JwtSecurityToken(
                 issuer: _options.ValidIssuer,
                 audience: _options.ValidAudience,
                 notBefore: DateTime.UtcNow,
                 claims: claims,
-                expires: DateTime.UtcNow.Add(_options.RefreshTokenExpiry),
+                expires: expiry,
                 signingCredentials: new SigningCredentials(
                     new SymmetricSecurityKey(_options.RefreshSecurityKeyBytes),
                     SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-            return encodedJwt;
+            var token = new JwtSecurityTokenHandler().WriteToken(jwt);
+            return (token, expiry);
         }
 
         private List<Claim> GetAccessClaims(
@@ -182,7 +185,7 @@ namespace NSV.Security.JWT
             return claims;
         }
 
-        private (JwtTokenResult.TokenResult result, bool update, Claim[] claims) 
+        private (JwtTokenResult.TokenResult result, bool update, Claim[] claims)
             ValidateRefreshToken(string refreshToken)
         {
             var jwt = new JwtSecurityTokenHandler();
