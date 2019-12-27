@@ -35,12 +35,12 @@ Add to appsettinegs.json file new configure section, like this:
   },
 ```
 
-*`ValidIssuer`, `ValidAudience` - standatd jwt configuration.
-*`AccessSecurityKey` - secret seqcurity key for access token.
-*`AccessTokenExpiry` - access token lifetime.
-*`RefreshSecurityKey` - secret seqcurity key for "refresh" token.
-*`RefreshTokenExpiry` - "refresh" token lifetime, must be greater then `AccessTokenExpiry`.
-*`UpdateRefreshTokenBeforeExpired` - this field indicate when "refresh" token should be re created when `RefreshAccessToken(..)` called
+* `ValidIssuer`, `ValidAudience` - standatd jwt configuration.
+* `AccessSecurityKey` - secret seqcurity key for access token.
+* `AccessTokenExpiry` - access token lifetime.
+* `RefreshSecurityKey` - secret seqcurity key for "refresh" token.
+* `RefreshTokenExpiry` - "refresh" token lifetime, must be greater then `AccessTokenExpiry`.
+* `UpdateRefreshTokenBeforeExpired` - this field indicate when "refresh" token should be re created when `RefreshAccessToken(..)` called
 
 
 Add `JwtService` it to asp .net core pipeline by using extensions method 
