@@ -37,6 +37,5 @@ namespace NSV.Security.JWT
             public string Value { get; set; }
             public DateTime Expiration { get; set; }
         }
-
     }
 }

@@ -109,6 +109,38 @@ namespace NSV.Security.Jwt.UnitTests
         }
 
         [Fact]
+        public async Task IssueAndRefreshWithSameJti()
+        {
+            var jwtService = JwtServiceFactory.Create(
+              TimeSpan.FromSeconds(5),
+               TimeSpan.FromSeconds(300),
+               TimeSpan.FromSeconds(10));
+            var user = GetUser();
+            var access = jwtService
+                .IssueAccessToken(user.id, user.name, user.roles);
+
+            Assert.NotNull(access.RefreshTokenJti);
+
+            int index = 0;
+            var accessToken = access.Tokens.AccessToken;
+            while (index < 4)
+            {
+                index++;
+                await Task.Delay(TimeSpan.FromSeconds(6));
+
+                var refreshedAccess = jwtService
+                    .RefreshAccessToken(
+                        accessToken.Value,
+                        access.Tokens.RefreshToken.Value);
+
+                Assert.True(refreshedAccess.Result == JwtTokenResult.TokenResult.Ok);
+                Assert.Equal(access.RefreshTokenJti, refreshedAccess.RefreshTokenJti);
+
+                accessToken.Value = refreshedAccess.Tokens.AccessToken.Value;
+            }
+        }
+
+        [Fact]
         public async Task IssueAndRefreshUntilRefreshTokenNotExpired()
         {
             var jwtService = JwtServiceFactory.Create(
@@ -118,6 +150,8 @@ namespace NSV.Security.Jwt.UnitTests
             var user = GetUser();
             var access = jwtService
                 .IssueAccessToken(user.id, user.name, user.roles);
+
+            Assert.NotNull(access.RefreshTokenJti);
 
             int index = 0;
             var accessToken = access.Tokens.AccessToken;

@@ -27,11 +27,12 @@ namespace NSV.Security.JWT
             string name,
             IEnumerable<string> roles)
         {
+            var refreshResult = GetRefreshToken(id, name);
             var model = new TokenModel(
                 GetAccessToken(id, name, roles),
-                GetRefreshToken(id, name)
+                (refreshResult.token, refreshResult.expiry)
             );
-            return JwtTokenResult.Ok(model);
+            return JwtTokenResult.Ok(model, refreshResult.jti);
         }
 
         public JwtTokenResult RefreshAccessToken(
@@ -59,6 +60,10 @@ namespace NSV.Security.JWT
                 .FirstOrDefault(x => x.Type
                 .Equals(identityOptions.ClaimsIdentity.UserIdClaimType))
                 .Value;
+            var jti = result.claims
+                .FirstOrDefault(x => x.Type
+                .Equals(JwtRegisteredClaimNames.Jti))
+                .Value;
             var accessId = accessClaims
                 .FirstOrDefault(x => x.Type
                 .Equals(identityOptions.ClaimsIdentity.UserIdClaimType))
@@ -79,23 +84,30 @@ namespace NSV.Security.JWT
 
             if (result.update)
             {
+                var newRefreshToken = GetRefreshToken(accessId, accessName);
+
                 return JwtTokenResult.Ok(new TokenModel
                 (
                     newAccessToken,
-                    GetRefreshToken(accessId, accessName)
-                ));
+                    (newRefreshToken.token, newRefreshToken.expiry)
+                ), 
+                newRefreshToken.jti);
             }
 
-            return JwtTokenResult.Ok(new TokenModel(newAccessToken));
+            return JwtTokenResult.Ok(new TokenModel(newAccessToken), jti);
         }
 
         #region private methods
-        private (string token, DateTime expiry) GetRefreshToken(
+        private (string token, DateTime expiry, string jti) GetRefreshToken(
             string id,
             string name)
         {
             var claims = GetRefreshClaims(id, name);
-            return CreateRefreshToken(claims);
+            var jti = claims
+                .FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)
+                .Value;
+            var (token, expiry) = CreateRefreshToken(claims);
+            return (token, expiry, jti);
         }
 
         private (string token, DateTime expiry) GetAccessToken(
