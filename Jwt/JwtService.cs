@@ -32,7 +32,7 @@ namespace NSV.Security.JWT
                 GetAccessToken(id, name, roles),
                 (refreshResult.token, refreshResult.expiry)
             );
-            return JwtTokenResult.Ok(model, refreshResult.jti);
+            return JwtTokenResult.Ok(model, refreshResult.jti, id);
         }
 
         public JwtTokenResult RefreshAccessToken(
@@ -60,10 +60,7 @@ namespace NSV.Security.JWT
                 .FirstOrDefault(x => x.Type
                 .Equals(identityOptions.ClaimsIdentity.UserIdClaimType))
                 .Value;
-            var jti = result.claims
-                .FirstOrDefault(x => x.Type
-                .Equals(JwtRegisteredClaimNames.Jti))
-                .Value;
+
             var accessId = accessClaims
                 .FirstOrDefault(x => x.Type
                 .Equals(identityOptions.ClaimsIdentity.UserIdClaimType))
@@ -71,6 +68,10 @@ namespace NSV.Security.JWT
             if (!refreshId.Equals(accessId))
                 return JwtTokenResult.Mismatch();
 
+            var jti = result.claims
+                .FirstOrDefault(x => x.Type
+                .Equals(JwtRegisteredClaimNames.Jti))
+                .Value;
             var accessName = accessClaims
                 .FirstOrDefault(x => x.Type
                 .Equals(identityOptions.ClaimsIdentity.UserNameClaimType))
@@ -90,11 +91,12 @@ namespace NSV.Security.JWT
                 (
                     newAccessToken,
                     (newRefreshToken.token, newRefreshToken.expiry)
-                ), 
-                newRefreshToken.jti);
+                ),
+                newRefreshToken.jti,
+                accessId);
             }
 
-            return JwtTokenResult.Ok(new TokenModel(newAccessToken), jti);
+            return JwtTokenResult.Ok(new TokenModel(newAccessToken), jti, accessId);
         }
 
         #region private methods
