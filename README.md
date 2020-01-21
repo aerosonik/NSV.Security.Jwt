@@ -161,4 +161,4 @@ public struct JwtTokenResult
 ```
 * `TokenModel` - contains Access and Refresh token and theirs expiration dates.
 * `TokenResult` - enum, it can be : `Ok`, `RefreshTokenInvalid`, `AccessTokenInvalid`, `TokensMismatch`, `RefreshTokenExpired`. When we call method `jwtService.IssueAccessToken`,  only `Ok` can be returned.
-* `RefreshTokenJti` - it contains current "RefeshToken" JTI claim. It can be used in case when you shouold store every access token in DB and refer to related "RefreshToken".
+* `RefreshTokenJti` - it's a string representation of GUID, property contains current "RefeshToken" JTI claim. It can be used in case when you shouold store every access token in DB and refer to related "RefreshToken".
