@@ -8,7 +8,7 @@ Lightwiweigth JWT library. It can issue tokens and validate with refresing both 
 
 ## Installation
 
-Get latest stable version from [NuGet](https://www.nuget.org/packages/NSV.ExecutionPipe/).
+Get latest stable version from [NuGet](https://www.nuget.org/packages/NSV.Security.Jwt).
 
 ## Features
 
