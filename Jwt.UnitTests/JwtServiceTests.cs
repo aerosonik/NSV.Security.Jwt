@@ -41,7 +41,7 @@ namespace NSV.Security.Jwt.UnitTests
                     .Claims.ToArray();
             var accessId = accessClaims
                 .FirstOrDefault(x => x.Type
-                .Equals(identityOptions.ClaimsIdentity.UserIdClaimType))
+                .Equals(JwtRegisteredClaimNames.Sub))
                 .Value;
             var accessName = accessClaims
                 .FirstOrDefault(x => x.Type
@@ -80,7 +80,7 @@ namespace NSV.Security.Jwt.UnitTests
             Assert.True(refreshedAccess.Result == JwtTokenResult.TokenResult.Ok);
             Assert.NotNull(refreshedAccess.Tokens);
             Assert.NotNull(refreshedAccess.Tokens.AccessToken);
-            Assert.Null(refreshedAccess.Tokens.RefreshToken);
+            Assert.Null(refreshedAccess.Tokens.RefreshToken.Value);
             Assert.Equal(user.id, refreshedAccess.UserId);
 
             var identityOptions = new IdentityOptions();
@@ -89,7 +89,7 @@ namespace NSV.Security.Jwt.UnitTests
                     .Claims.ToArray();
             var accessId = accessClaims
                 .FirstOrDefault(x => x.Type
-                .Equals(identityOptions.ClaimsIdentity.UserIdClaimType))
+                .Equals(JwtRegisteredClaimNames.Sub))
                 .Value;
             var accessName = accessClaims
                 .FirstOrDefault(x => x.Type
@@ -120,10 +120,10 @@ namespace NSV.Security.Jwt.UnitTests
             var access = jwtService
                 .IssueAccessToken(user.id, user.name, user.roles);
 
-            Assert.NotNull(access.RefreshTokenJti);
+            Assert.NotNull(access.Tokens.RefreshToken);
 
             int index = 0;
-            var accessToken = access.Tokens.AccessToken;
+            var accessToken = access.Tokens.AccessToken.Value;
             while (index < 4)
             {
                 index++;
@@ -131,14 +131,14 @@ namespace NSV.Security.Jwt.UnitTests
 
                 var refreshedAccess = jwtService
                     .RefreshAccessToken(
-                        accessToken.Value,
+                        accessToken,
                         access.Tokens.RefreshToken.Value);
 
                 Assert.True(refreshedAccess.Result == JwtTokenResult.TokenResult.Ok);
-                Assert.Equal(access.RefreshTokenJti, refreshedAccess.RefreshTokenJti);
+                Assert.Equal(access.Tokens.RefreshToken.Jti, refreshedAccess.Tokens.RefreshToken.Jti);
                 Assert.Equal(user.id, refreshedAccess.UserId);
 
-                accessToken.Value = refreshedAccess.Tokens.AccessToken.Value;
+                accessToken = refreshedAccess.Tokens.AccessToken.Value;
             }
         }
 
@@ -153,10 +153,10 @@ namespace NSV.Security.Jwt.UnitTests
             var access = jwtService
                 .IssueAccessToken(user.id, user.name, user.roles);
 
-            Assert.NotNull(access.RefreshTokenJti);
+            Assert.NotNull(access.Tokens.RefreshToken);
 
             int index = 0;
-            var accessToken = access.Tokens.AccessToken;
+            var accessToken = access.Tokens.AccessToken.Value;
             while (index < 4)
             {
                 index++;
@@ -164,7 +164,7 @@ namespace NSV.Security.Jwt.UnitTests
 
                 var refreshedAccess = jwtService
                     .RefreshAccessToken(
-                        accessToken.Value,
+                        accessToken,
                         access.Tokens.RefreshToken.Value);
 
                 Assert.True(refreshedAccess.Result == JwtTokenResult.TokenResult.Ok);
@@ -176,7 +176,7 @@ namespace NSV.Security.Jwt.UnitTests
                         .Claims.ToArray();
                 var accessId = accessClaims
                     .FirstOrDefault(x => x.Type
-                    .Equals(identityOptions.ClaimsIdentity.UserIdClaimType))
+                    .Equals(JwtRegisteredClaimNames.Sub))
                     .Value;
                 var accessName = accessClaims
                     .FirstOrDefault(x => x.Type
@@ -192,17 +192,17 @@ namespace NSV.Security.Jwt.UnitTests
                 {
                     Assert.Contains(role.Value, user.roles);
                 }
-                Assert.False(accessToken.Value
+                Assert.False(accessToken
                     .Equals(refreshedAccess.Tokens.AccessToken.Value));
 
-                accessToken.Value = refreshedAccess.Tokens.AccessToken.Value;
+                accessToken = refreshedAccess.Tokens.AccessToken.Value;
             }
 
             await Task.Delay(TimeSpan.FromSeconds(20));
 
             var unRefreshedAccess = jwtService
                     .RefreshAccessToken(
-                        accessToken.Value,
+                        accessToken,
                         access.Tokens.RefreshToken.Value);
 
             Assert.True(unRefreshedAccess.Result == 

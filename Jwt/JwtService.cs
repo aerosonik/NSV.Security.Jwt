@@ -12,10 +12,6 @@ namespace NSV.Security.JWT
     internal class JwtService : IJwtService
     {
         private readonly JwtOptions _options;
-        //public JwtService(IOptions<JwtOptions> options)
-        //{
-        //    _options = options.Value;
-        //}
 
         internal JwtService(JwtOptions options)
         {
@@ -27,12 +23,13 @@ namespace NSV.Security.JWT
             string name,
             IEnumerable<string> roles)
         {
+            var accessResult = GetAccessToken(id, name, roles);
             var refreshResult = GetRefreshToken(id, name);
             var model = new TokenModel(
-                GetAccessToken(id, name, roles),
-                (refreshResult.token, refreshResult.expiry)
+                (accessResult.token, accessResult.expiry, accessResult.jti),
+                (refreshResult.token, refreshResult.expiry, refreshResult.jti)
             );
-            return JwtTokenResult.Ok(model, refreshResult.jti, id);
+            return JwtTokenResult.Ok(model, id);
         }
 
         public JwtTokenResult RefreshAccessToken(
@@ -58,17 +55,17 @@ namespace NSV.Security.JWT
             var identityOptions = new IdentityOptions();
             var refreshId = result.claims
                 .FirstOrDefault(x => x.Type
-                .Equals(identityOptions.ClaimsIdentity.UserIdClaimType))
+                .Equals(JwtRegisteredClaimNames.Sub))
                 .Value;
 
             var accessId = accessClaims
                 .FirstOrDefault(x => x.Type
-                .Equals(identityOptions.ClaimsIdentity.UserIdClaimType))
+                .Equals(JwtRegisteredClaimNames.Sub))
                 .Value;
             if (!refreshId.Equals(accessId))
                 return JwtTokenResult.Mismatch();
 
-            var jti = result.claims
+            var refreshJti = result.claims
                 .FirstOrDefault(x => x.Type
                 .Equals(JwtRegisteredClaimNames.Jti))
                 .Value;
@@ -90,13 +87,14 @@ namespace NSV.Security.JWT
                 return JwtTokenResult.Ok(new TokenModel
                 (
                     newAccessToken,
-                    (newRefreshToken.token, newRefreshToken.expiry)
+                    newRefreshToken
                 ),
-                newRefreshToken.jti,
                 accessId);
             }
 
-            return JwtTokenResult.Ok(new TokenModel(newAccessToken), jti, accessId);
+            return JwtTokenResult.Ok(
+                new TokenModel(newAccessToken, (null, default, refreshJti)), 
+                accessId);
         }
 
         #region private methods
@@ -112,7 +110,7 @@ namespace NSV.Security.JWT
             return (token, expiry, jti);
         }
 
-        private (string token, DateTime expiry) GetAccessToken(
+        private (string token, DateTime expiry, string jti) GetAccessToken(
             string id,
             string name,
             IEnumerable<string> roles)
@@ -121,7 +119,7 @@ namespace NSV.Security.JWT
             return CreateAccessToken(claims);
         }
 
-        private (string token, DateTime expiry) CreateAccessToken(
+        private (string token, DateTime expiry, string jti) CreateAccessToken(
             IEnumerable<Claim> claims)
         {
             var expiry = DateTime.UtcNow.Add(_options.AccessTokenExpiry);
@@ -135,7 +133,10 @@ namespace NSV.Security.JWT
                     new SymmetricSecurityKey(_options.AccessSecurityKeyBytes),
                     SecurityAlgorithms.HmacSha256));
             var token = new JwtSecurityTokenHandler().WriteToken(jwt);
-            return (token, expiry);
+            var jti = claims
+                .FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)
+                .Value;
+            return (token, expiry, jti);
         }
 
         private (string token, DateTime expiry) CreateRefreshToken(
@@ -188,11 +189,12 @@ namespace NSV.Security.JWT
             var identityOptions = new IdentityOptions();
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, name),
+                //new Claim(JwtRegisteredClaimNames.Sub, name),
+                new Claim(JwtRegisteredClaimNames.Sub, id),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(),
                     ClaimValueTypes.Integer64),
-                new Claim(identityOptions.ClaimsIdentity.UserIdClaimType, id),
+                //new Claim(identityOptions.ClaimsIdentity.UserIdClaimType, id),
                 new Claim(identityOptions.ClaimsIdentity.UserNameClaimType, name)
             };
 
