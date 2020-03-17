@@ -11,7 +11,8 @@
     <Product>NSV.Security.Jwt</Product>
     <PackageProjectUrl>https://github.com/aerosonik/NSV.Security.Jwt</PackageProjectUrl>
     <RepositoryUrl>https://github.com/aerosonik/NSV.Security.Jwt</RepositoryUrl>
-    <Copyright>aerosonik@nsv 2019</Copyright>
+    <PackageIconUrl>https://raw.githubusercontent.com/aerosonik/NSV.Security.Jwt/master/icon.png</PackageIconUrl>
+    <Copyright>aerosonik@nsv 2020</Copyright>
     <PackageTags>jwt</PackageTags>
     <PackageVersion></PackageVersion>
     <AssemblyVersion>1.0.0.1</AssemblyVersion>
