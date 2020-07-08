@@ -23,7 +23,16 @@ namespace NSV.Security.JWT
             string name,
             IEnumerable<string> roles)
         {
-            var accessResult = GetAccessToken(id, name, roles);
+            return IssueAccessToken(id, name, roles, null);
+        }
+
+        public JwtTokenResult IssueAccessToken(
+            string id,
+            string name,
+            IEnumerable<string> roles,
+            IEnumerable<KeyValuePair<string, string>> customClaims)
+        {
+            var accessResult = GetAccessToken(id, name, roles, customClaims);
             var refreshResult = GetRefreshToken(id, name);
             var model = new TokenModel(
                 (accessResult.token, accessResult.expiry, accessResult.jti),
@@ -35,6 +44,14 @@ namespace NSV.Security.JWT
         public JwtTokenResult RefreshAccessToken(
             string accessToken,
             string refreshToken)
+        {
+            return RefreshAccessToken(accessToken, refreshToken, null);
+        }
+
+        public JwtTokenResult RefreshAccessToken(
+        string accessToken,
+        string refreshToken,
+        IEnumerable<string> customClaimsType)
         {
             var result = ValidateRefreshToken(refreshToken);
             if (result.result != JwtTokenResult.TokenResult.Ok)
@@ -77,7 +94,19 @@ namespace NSV.Security.JWT
                 .Where(x => x.Type
                 .Equals(ClaimTypes.Role));
 
-            var claims = GetAccessClaims(accessId, accessName, roles);
+            List<Claim> claims = null;
+            if (customClaimsType != null)
+            {
+                var customClaims = accessClaims
+                    .Where(claim => customClaimsType.Contains(claim.Type));
+
+                claims = GetAccessClaims(accessId, accessName, roles, customClaims);
+            }
+            else
+            {
+                claims = GetAccessClaims(accessId, accessName, roles);
+            }
+
             var newAccessToken = CreateAccessToken(claims);
 
             if (result.update)
@@ -93,7 +122,7 @@ namespace NSV.Security.JWT
             }
 
             return JwtTokenResult.Ok(
-                new TokenModel(newAccessToken, (null, default, refreshJti)), 
+                new TokenModel(newAccessToken, (null, default, refreshJti)),
                 accessId);
         }
 
@@ -113,9 +142,10 @@ namespace NSV.Security.JWT
         private (string token, DateTime expiry, string jti) GetAccessToken(
             string id,
             string name,
-            IEnumerable<string> roles)
+            IEnumerable<string> roles,
+            IEnumerable<KeyValuePair<string, string>> customClaims = null)
         {
-            var claims = GetAccessClaims(id, name, roles);
+            var claims = GetAccessClaims(id, name, roles, customClaims);
             return CreateAccessToken(claims);
         }
 
@@ -159,26 +189,31 @@ namespace NSV.Security.JWT
         private List<Claim> GetAccessClaims(
             string id,
             string name,
-            IEnumerable<string> roles)
+            IEnumerable<string> roles,
+            IEnumerable<KeyValuePair<string, string>> customClaims = null)
         {
             var identityOptions = new IdentityOptions();
             var claims = GetRefreshClaims(id, name);
 
             claims.AddRange(roles.Select(role =>
                 new Claim(ClaimTypes.Role, role)));
-
+            if (customClaims != null)
+                claims.AddRange(customClaims.Select(x =>
+                    new Claim(x.Key, x.Value)));
             return claims;
         }
 
         private List<Claim> GetAccessClaims(
             string id,
             string name,
-            IEnumerable<Claim> roles)
+            IEnumerable<Claim> roles,
+            IEnumerable<Claim> customClaims = null)
         {
             var claims = GetRefreshClaims(id, name);
 
             claims.AddRange(roles);
-
+            if (customClaims != null)
+                claims.AddRange(customClaims);
             return claims;
         }
 

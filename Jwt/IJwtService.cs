@@ -12,5 +12,16 @@ namespace NSV.Security.JWT
         JwtTokenResult RefreshAccessToken(
             string accessToken,
             string refreshToken);
+
+        JwtTokenResult IssueAccessToken(
+            string id,
+            string name,
+            IEnumerable<string> roles,
+            IEnumerable<KeyValuePair<string, string>> customClaims);
+
+        JwtTokenResult RefreshAccessToken(
+            string accessToken,
+            string refreshToken,
+            IEnumerable<string> customClaimsType);
     }
 }
