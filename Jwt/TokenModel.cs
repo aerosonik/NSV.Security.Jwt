@@ -4,7 +4,8 @@ namespace NSV.Security.JWT
 {
     public class TokenModel
     {
-        public TokenModel((string token, DateTime expiry, string jti, string refreshJti) accessToken)
+        public TokenModel(
+            (string token, DateTime expiry, string jti, string refreshJti) accessToken)
         {
             AccessToken = new Token(
                 accessToken.token,

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using NSV.Security.JWT;
 using System;
 using System.Linq;
@@ -46,7 +45,14 @@ namespace NSV.Security.Jwt.UnitTests
             Assert.NotNull(access.Tokens);
             Assert.NotNull(access.Tokens.AccessToken);
             Assert.NotNull(access.Tokens.RefreshToken);
-
+            var testclaims = access.AccessClaims
+                .Where(x => customClaimsType.Contains(x.Type))
+                .Select(x => new KeyValuePair<string, string>(x.Type, x.Value))
+                .ToArray();
+            foreach(var claimPair in testclaims)
+            {
+                Assert.Contains(claimPair, user.claims);
+            }
             var identityOptions = new IdentityOptions();
             var accessClaims = new JwtSecurityTokenHandler()
                     .ReadJwtToken(access.Tokens.AccessToken.Value)
@@ -143,6 +149,14 @@ namespace NSV.Security.Jwt.UnitTests
             Assert.NotNull(refreshedAccess.Tokens.AccessToken);
             Assert.Null(refreshedAccess.Tokens.RefreshToken.Value);
             Assert.Equal(user.id, refreshedAccess.UserId);
+            var testclaims = refreshedAccess.AccessClaims
+                .Where(x => customClaimsType.Contains(x.Type))
+                .Select(x => new KeyValuePair<string, string>(x.Type, x.Value))
+                .ToArray();
+            foreach (var claimPair in testclaims)
+            {
+                Assert.Contains(claimPair, user.claims);
+            }
 
             var identityOptions = new IdentityOptions();
             var accessClaims = new JwtSecurityTokenHandler()

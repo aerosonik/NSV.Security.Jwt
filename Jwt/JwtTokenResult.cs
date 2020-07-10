@@ -1,4 +1,7 @@
-﻿namespace NSV.Security.JWT
+﻿using System.Collections.Generic;
+using System.Security.Claims;
+
+namespace NSV.Security.JWT
 {
     public struct JwtTokenResult
     { 
@@ -6,14 +9,18 @@
         public TokenResult Result { get; }
         public string UserId { get; }
 
-        public JwtTokenResult(
+        public IEnumerable<Claim> AccessClaims { get; }
+
+        internal JwtTokenResult(
             TokenResult result = TokenResult.Ok, 
             TokenModel model = null,
-            string userId = null)
+            string userId = null,
+            IEnumerable<Claim> accessClaims = null)
         {
             Tokens = model;
             Result = result;
             UserId = userId;
+            AccessClaims = accessClaims;
         }
 
         public enum TokenResult
@@ -25,13 +32,17 @@
             RefreshTokenExpired
         }
 
-        internal static JwtTokenResult Ok(TokenModel model, string userId)
+        internal static JwtTokenResult Ok(
+            TokenModel model, 
+            string userId, 
+            IEnumerable<Claim> accessClaims)
         {
             return new JwtTokenResult
             (
                 model: model,
                 result: TokenResult.Ok,
-                userId: userId
+                userId: userId,
+                accessClaims: accessClaims
             );
         }
         internal static JwtTokenResult RefreshInvalid()
