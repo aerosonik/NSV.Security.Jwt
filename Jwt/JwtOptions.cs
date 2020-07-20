@@ -50,7 +50,8 @@ namespace NSV.Security.JWT
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = ValidIssuer,
                 ValidAudience = ValidAudience,
-                IssuerSigningKey = new SymmetricSecurityKey(AccessSecurityKeyBytes)
+                IssuerSigningKey = new SymmetricSecurityKey(AccessSecurityKeyBytes),
+                ClockSkew = TimeSpan.Zero
             };
         }
     }
