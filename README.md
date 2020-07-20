@@ -4,7 +4,7 @@
 Lightwiweigth JWT library. It can issue tokens and validate with refresing both - access/refresh tokens.
 
 [![NuGet](https://img.shields.io/nuget/v/NSV.Security.Jwt.svg)](https://www.nuget.org/packages/NSV.Security.Jwt) 
-[![Build status](https://ci.appveyor.com/api/projects/status/r3yptmhufh3dl1xc?svg=true)](https://ci.appveyor.com/project/aerosonik/nsv-security-jwt)
+[![Build status](https://ci.appveyor.com/api/projects/status/7hj4a9agnvplu2qq?svg=true)](https://ci.appveyor.com/project/aerosonik/nsv-security-jwt)
 
 ## Installation
 
