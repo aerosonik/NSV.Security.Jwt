@@ -253,9 +253,9 @@ namespace NSV.Security.Jwt.UnitTests
               TimeSpan.FromSeconds(5),
                TimeSpan.FromSeconds(300),
                TimeSpan.FromSeconds(10));
-            var user = GetUser();
+            var (id, name, roles) = GetUser();
             var access = jwtService
-                .IssueAccessToken(user.id, user.name, user.roles);
+                .IssueAccessToken(id, name, roles);
 
             Assert.NotNull(access.Tokens.RefreshToken);
 
@@ -273,7 +273,7 @@ namespace NSV.Security.Jwt.UnitTests
 
                 Assert.True(refreshedAccess.Result == JwtTokenResult.TokenResult.Ok);
                 Assert.Equal(access.Tokens.RefreshToken.Jti, refreshedAccess.Tokens.RefreshToken.Jti);
-                Assert.Equal(user.id, refreshedAccess.UserId);
+                Assert.Equal(id, refreshedAccess.UserId);
 
                 accessToken = refreshedAccess.Tokens.AccessToken.Value;
             }

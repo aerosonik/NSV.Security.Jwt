@@ -151,8 +151,8 @@ namespace NSV.Security.JWT
             IEnumerable<KeyValuePair<string, string>> customClaims = null)
         {
             var claims = GetAccessClaims(id, name, roles, customClaims);
-            var accesTokenData = CreateAccessToken(claims);
-            return (accesTokenData.token, accesTokenData.expiry, accesTokenData.jti, claims);
+            var (token, expiry, jti) = CreateAccessToken(claims);
+            return (token, expiry, jti, claims);
         }
 
         private (string token, DateTime expiry, string jti) CreateAccessToken(
