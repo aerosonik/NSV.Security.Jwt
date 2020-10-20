@@ -87,6 +87,65 @@ namespace NSV.Security.Jwt.UnitTests
         }
 
         [Fact]
+        public void IssueAccessTokenWithCustomClaim_userIdNull()
+        {
+            var jwtService = JwtServiceFactory.Create(
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromMinutes(5),
+                TimeSpan.FromSeconds(10));
+            var user = GetUserWithCustomClaime();
+
+            var access = jwtService
+                .IssueAccessToken(null, "", user.roles, user.claims);
+
+            var customClaimsType = user.claims.Select(x => x.Key).ToArray();
+
+            Assert.True(access.Result == JwtTokenResult.TokenResult.Ok);
+            Assert.NotNull(access.Tokens);
+            Assert.NotNull(access.Tokens.AccessToken);
+            Assert.NotNull(access.Tokens.RefreshToken);
+            var testclaims = access.AccessClaims
+                .Where(x => customClaimsType.Contains(x.Type))
+                .Select(x => new KeyValuePair<string, string>(x.Type, x.Value))
+                .ToArray();
+            foreach (var claimPair in testclaims)
+            {
+                Assert.Contains(claimPair, user.claims);
+            }
+            var identityOptions = new IdentityOptions();
+            var accessClaims = new JwtSecurityTokenHandler()
+                    .ReadJwtToken(access.Tokens.AccessToken.Value)
+                    .Claims.ToArray();
+            var accessId = accessClaims
+                .FirstOrDefault(x => x.Type
+                .Equals(JwtRegisteredClaimNames.Sub))
+                .Value;
+            var accessName = accessClaims
+                .FirstOrDefault(x => x.Type
+                .Equals(identityOptions.ClaimsIdentity.UserNameClaimType))
+                .Value;
+            var roles = accessClaims
+                .Where(x => x.Type
+                .Equals(ClaimTypes.Role));
+            var customClaims = accessClaims
+                .Where(x => customClaimsType.Contains(x.Type))
+                .Select(x => new KeyValuePair<string, string>(x.Type, x.Value))
+                .ToArray();
+
+            Assert.True(string.IsNullOrEmpty(accessId));
+            Assert.True(string.IsNullOrEmpty(accessName));
+            foreach (var role in roles)
+            {
+                Assert.Contains(role.Value, user.roles);
+            }
+
+            foreach (var claim in customClaims)
+            {
+                Assert.Contains(claim, user.claims);
+            }
+        }
+
+        [Fact]
         public void IssueAccessToken()
         {
             var jwtService = JwtServiceFactory.Create(

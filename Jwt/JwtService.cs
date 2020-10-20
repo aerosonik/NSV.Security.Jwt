@@ -227,6 +227,10 @@ namespace NSV.Security.JWT
             string id,
             string name)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                id = string.Empty;
+            if (string.IsNullOrWhiteSpace(name))
+                name = string.Empty;
             var identityOptions = new IdentityOptions();
             var claims = new List<Claim>
             {
