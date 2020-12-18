@@ -130,6 +130,15 @@ namespace NSV.Security.JWT
                 accessClaims);
         }
 
+        TokenDetails GetTokenDetails(string token)
+        {
+            var jwtToken = new JwtSecurityTokenHandler()
+                    .ReadJwtToken(token);
+            var claims = jwtToken.Claims.ToArray();
+            var expiration = jwtToken.ValidTo;
+            return new TokenDetails(expiration, claims);
+        }
+
         #region private methods
         private (string token, DateTime expiry, string jti) GetRefreshToken(
             string id,
