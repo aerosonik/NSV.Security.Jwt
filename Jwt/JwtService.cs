@@ -130,7 +130,7 @@ namespace NSV.Security.JWT
                 accessClaims);
         }
 
-        TokenDetails GetTokenDetails(string token)
+        public TokenDetails GetTokenDetails(string token)
         {
             var jwtToken = new JwtSecurityTokenHandler()
                     .ReadJwtToken(token);

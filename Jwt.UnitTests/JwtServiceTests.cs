@@ -449,5 +449,25 @@ namespace NSV.Security.Jwt.UnitTests
                 JwtTokenResult.TokenResult.Ok);
             Assert.NotNull(unRefreshedAccess.Tokens.RefreshToken);
         }
+
+        [Fact]
+        public void IssueTokenAndAssertDetails()
+        {
+            var jwtService = JwtServiceFactory.Create(
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromMinutes(5),
+                TimeSpan.FromSeconds(10));
+            var user = GetUserWithCustomClaime();
+
+            var tokenModel = jwtService
+                .IssueAccessToken(user.id, user.name, user.roles, user.claims);
+
+            var tokenDetails = jwtService.GetTokenDetails(tokenModel.Tokens.AccessToken.Value);
+
+            Assert.Equal(tokenModel.Tokens.AccessToken.Expiration.ToShortTimeString(), tokenDetails.Expiration.ToShortTimeString());
+            Assert.Equal(tokenModel.Tokens.AccessToken.Jti, tokenDetails.Jti);
+            Assert.Equal(user.id, tokenDetails.Subject);
+            Assert.All(tokenDetails.Roles, role => user.roles.Contains(role));
+        }
     }
 }
