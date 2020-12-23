@@ -8,7 +8,7 @@ namespace NSV.Security.JWT
 {
     public struct TokenDetails
     {
-        private Claim[] _claims;
+        private readonly Claim[] _claims;
 
         public TokenDetails(DateTime expiration, Claim[] claims)
         {
