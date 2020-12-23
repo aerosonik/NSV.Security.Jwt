@@ -23,5 +23,7 @@ namespace NSV.Security.JWT
             string accessToken,
             string refreshToken,
             IEnumerable<string> customClaimsType);
+
+        TokenDetails GetTokenDetails(string token);
     }
 }
