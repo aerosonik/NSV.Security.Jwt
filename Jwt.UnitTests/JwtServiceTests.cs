@@ -462,7 +462,8 @@ namespace NSV.Security.Jwt.UnitTests
             var tokenModel = jwtService
                 .IssueAccessToken(user.id, user.name, user.roles, user.claims);
 
-            var tokenDetails = jwtService.GetTokenDetails(tokenModel.Tokens.AccessToken.Value);
+            var tokenDetails = new JwtTokenDetails()
+                .Get(tokenModel.Tokens.AccessToken.Value);
 
             Assert.Equal(tokenModel.Tokens.AccessToken.Expiration.ToShortTimeString(), tokenDetails.Expiration.ToShortTimeString());
             Assert.Equal(tokenModel.Tokens.AccessToken.Jti, tokenDetails.Jti);

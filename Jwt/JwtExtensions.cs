@@ -6,16 +6,14 @@ namespace NSV.Security.JWT
 {
     public static class JwtExtensions
     {
-        //public static IServiceCollection AddJwt(
-        //    this IServiceCollection serviceCollection)
-        //{
-        //    //JwtParameters.Options =  new JwtOptions();
-        //    //serviceCollection.Configure<JwtOptions>(conf => conf = Jwt.Options);
-        //    return serviceCollection.AddSingleton<IJwtService>(provider => 
-        //    {
-        //        return new JwtService(JwtSettings.Options);
-        //    });
-        //}
+        public static IServiceCollection AddJwtTokenDetails(
+            this IServiceCollection serviceCollection)
+        {
+            return serviceCollection.AddSingleton<IJwtTokenDetails>(provider =>
+            {
+                return new JwtTokenDetails();
+            });
+        }
 
         public static IServiceCollection AddJwt(
             this IServiceCollection serviceCollection,
@@ -36,7 +34,6 @@ namespace NSV.Security.JWT
             this IServiceCollection serviceCollection,
             Action<JwtOptions> configureOptions)
         {
-            //JwtSettitngs.Options = new JwtOptions();
             configureOptions.Invoke(JwtSettings.Options);
             serviceCollection.Configure<JwtOptions>(conf => conf = JwtSettings.Options);
             return serviceCollection.AddSingleton<IJwtService>(provider =>
