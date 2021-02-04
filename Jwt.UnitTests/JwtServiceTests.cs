@@ -186,6 +186,36 @@ namespace NSV.Security.Jwt.UnitTests
         }
 
         [Fact]
+        public void IssueAccessTokenWithLongTermRefresh()
+        {
+            string longTermExpiry = "XRefreshExpiry";
+            var jwtService = JwtServiceFactory.Create(
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromMinutes(5),
+                TimeSpan.FromHours(1),
+                longTermExpiry,
+                TimeSpan.FromSeconds(10));
+            var user = GetUser();
+
+            var access = jwtService
+                .IssueAccessToken(user.id, user.name, user.roles, true);
+
+            Assert.True(access.Result == JwtTokenResult.TokenResult.Ok);
+            Assert.NotNull(access.Tokens);
+            Assert.NotNull(access.Tokens.AccessToken);
+            Assert.NotNull(access.Tokens.RefreshToken);
+
+            var refreshDetails = new JwtTokenDetails()
+                .Get(access.Tokens.RefreshToken.Value);
+
+            Assert.True(refreshDetails.Expiration > DateTime.UtcNow.AddMinutes(5) &&
+                        refreshDetails.Expiration < DateTime.UtcNow.AddMinutes(60));
+
+            Assert.Contains(refreshDetails.Claims, x => x.Type.Equals(longTermExpiry) && 
+                                                        x.Value.Equals(Boolean.TrueString));
+        }
+
+        [Fact]
         public async Task IssueAndRefreshAccessTokenWithCustomClaim()
         {
             var jwtService = JwtServiceFactory.Create(
@@ -303,6 +333,39 @@ namespace NSV.Security.Jwt.UnitTests
             }
             Assert.False(access.Tokens.AccessToken
                 .Equals(refreshedAccess.Tokens.AccessToken));
+        }
+
+        [Fact]
+        public async Task IssueAndRefreshAccessTokenWithLongTerm()
+        {
+            string longTermExpiry = "XRefreshExpiry";
+            var jwtService = JwtServiceFactory.Create(
+                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(2),
+                TimeSpan.FromSeconds(5),
+                longTermExpiry,
+                TimeSpan.FromSeconds(1));
+            var user = GetUser();
+            var access = jwtService
+                .IssueAccessToken(user.id, user.name, user.roles, true);
+
+            await Task.Delay(4000);
+
+            var refreshedAccess = jwtService
+                .RefreshAccessToken(
+                    access.Tokens.AccessToken.Value,
+                    access.Tokens.RefreshToken.Value);
+
+            Assert.True(refreshedAccess.Result == JwtTokenResult.TokenResult.Ok);
+
+            var refreshDetails = new JwtTokenDetails()
+                .Get(refreshedAccess.Tokens.RefreshToken.Value);
+
+            Assert.True(refreshDetails.Expiration > DateTime.UtcNow.AddSeconds(2) &&
+                        refreshDetails.Expiration < DateTime.UtcNow.AddSeconds(5));
+
+            Assert.Contains(refreshDetails.Claims, x => x.Type.Equals(longTermExpiry) && 
+                                                        x.Value.Equals(Boolean.TrueString));
         }
 
         [Fact]

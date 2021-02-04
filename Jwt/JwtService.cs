@@ -20,19 +20,21 @@ namespace NSV.Security.JWT
         public JwtTokenResult IssueAccessToken(
             string id,
             string name,
-            IEnumerable<string> roles)
+            IEnumerable<string> roles,
+            bool longTermRefresh = false)
         {
-            return IssueAccessToken(id, name, roles, null);
+            return IssueAccessToken(id, name, roles, null, longTermRefresh);
         }
 
         public JwtTokenResult IssueAccessToken(
             string id,
             string name,
             IEnumerable<string> roles,
-            IEnumerable<KeyValuePair<string, string>> customClaims)
+            IEnumerable<KeyValuePair<string, string>> customClaims,
+            bool longTermRefresh = false)
         {
             var accessResult = GetAccessToken(id, name, roles, customClaims);
-            var refreshResult = GetRefreshToken(id, name);
+            var refreshResult = GetRefreshToken(id, name, longTermRefresh);
             var model = new TokenModel(
                 (accessResult.token, accessResult.expiry, accessResult.jti),
                 (refreshResult.token, refreshResult.expiry, refreshResult.jti)
@@ -113,7 +115,11 @@ namespace NSV.Security.JWT
 
             if (result.update)
             {
-                var newRefreshToken = GetRefreshToken(accessId, accessName);
+                bool longTermRefresh = result.claims
+                    .Any(x => x.Type.Equals(_options.LongTermRefreshTokenClaim) &&
+                              x.Value.Equals(Boolean.TrueString));
+               
+                var newRefreshToken = GetRefreshToken(accessId, accessName, longTermRefresh);
 
                 return JwtTokenResult.Ok(new TokenModel
                 (
@@ -133,13 +139,16 @@ namespace NSV.Security.JWT
         #region private methods
         private (string token, DateTime expiry, string jti) GetRefreshToken(
             string id,
-            string name)
+            string name,
+            bool longTermRefresh)
         {
             var claims = GetRefreshClaims(id, name);
             var jti = claims
                 .FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)
                 .Value;
-            var (token, expiry) = CreateRefreshToken(claims);
+            if (longTermRefresh)
+                claims.Add(new Claim(_options.LongTermRefreshTokenClaim, Boolean.TrueString));
+            var (token, expiry) = CreateRefreshToken(claims, longTermRefresh);
             return (token, expiry, jti);
         }
 
@@ -176,9 +185,12 @@ namespace NSV.Security.JWT
         }
 
         private (string token, DateTime expiry) CreateRefreshToken(
-            IEnumerable<Claim> claims)
+            IEnumerable<Claim> claims,
+            bool longTermRefresh)
         {
-            var expiry = DateTime.UtcNow.Add(_options.RefreshTokenExpiry);
+            var expiry = longTermRefresh
+                ? DateTime.UtcNow.Add(_options.LongTermRefreshTokenExpiry)
+                : DateTime.UtcNow.Add(_options.RefreshTokenExpiry);
             var jwt = new JwtSecurityToken(
                 issuer: _options.ValidIssuer,
                 audience: _options.ValidAudience,

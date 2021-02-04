@@ -12,6 +12,8 @@ namespace NSV.Security.JWT
         public TimeSpan AccessTokenExpiry { get; set; } = TimeSpan.FromMinutes(30);
         public string RefreshSecurityKey { get; set; } = "c16455f1-c88e-4b92-bb4d-79749e989592@identity.nsv.pub/defaultRefreshSecurityKey";
         public TimeSpan RefreshTokenExpiry { get; set; } = TimeSpan.FromDays(5);
+        public TimeSpan LongTermRefreshTokenExpiry { get; set; } = TimeSpan.FromDays(5);
+        public string LongTermRefreshTokenClaim{ get; set; } = "rememberme";
         public TimeSpan UpdateRefreshTokenBeforeExpired { get; set; } = TimeSpan.FromDays(1);
 
         public byte[] AccessSecurityKeyBytes

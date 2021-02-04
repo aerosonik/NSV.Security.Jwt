@@ -7,7 +7,8 @@ namespace NSV.Security.JWT
         JwtTokenResult IssueAccessToken(
             string id,
             string name,
-            IEnumerable<string> roles);
+            IEnumerable<string> roles,
+            bool longTermRefresh = false);
 
         JwtTokenResult RefreshAccessToken(
             string accessToken,
@@ -17,7 +18,8 @@ namespace NSV.Security.JWT
             string id,
             string name,
             IEnumerable<string> roles,
-            IEnumerable<KeyValuePair<string, string>> customClaims);
+            IEnumerable<KeyValuePair<string, string>> customClaims,
+            bool longTermRefresh = false);
 
         JwtTokenResult RefreshAccessToken(
             string accessToken,
