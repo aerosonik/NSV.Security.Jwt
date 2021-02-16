@@ -83,10 +83,10 @@ namespace NSV.Security.JWT
             if (!refreshId.Equals(accessId))
                 return JwtTokenResult.Mismatch();
 
-            var refreshJti = result.claims
-                .FirstOrDefault(x => x.Type
-                .Equals(JwtRegisteredClaimNames.Jti))
-                .Value;
+            //var refreshJti = result.claims
+            //    .FirstOrDefault(x => x.Type
+            //    .Equals(JwtRegisteredClaimNames.Jti))
+            //    .Value;
             var accessName = accessClaims
                 .FirstOrDefault(x => x.Type
                 .Equals(identityOptions.ClaimsIdentity.UserNameClaimType))
@@ -129,9 +129,12 @@ namespace NSV.Security.JWT
                 accessId,
                 accessClaims);
             }
-
+            var incomingRefreshDetails = new JwtTokenDetails()
+                .Get(refreshToken);
             return JwtTokenResult.Ok(
-                new TokenModel(newAccessToken, (null, default, refreshJti)),
+                new TokenModel(
+                    newAccessToken, 
+                    (refreshToken, incomingRefreshDetails.Expiration, incomingRefreshDetails.Jti)),
                 accessId,
                 accessClaims);
         }

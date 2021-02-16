@@ -236,7 +236,7 @@ namespace NSV.Security.Jwt.UnitTests
             Assert.True(refreshedAccess.Result == JwtTokenResult.TokenResult.Ok);
             Assert.NotNull(refreshedAccess.Tokens);
             Assert.NotNull(refreshedAccess.Tokens.AccessToken);
-            Assert.Null(refreshedAccess.Tokens.RefreshToken.Value);
+            Assert.NotNull(refreshedAccess.Tokens.RefreshToken.Value);
             Assert.Equal(user.id, refreshedAccess.UserId);
             var testclaims = refreshedAccess.AccessClaims
                 .Where(x => customClaimsType.Contains(x.Type))
@@ -306,7 +306,7 @@ namespace NSV.Security.Jwt.UnitTests
             Assert.True(refreshedAccess.Result == JwtTokenResult.TokenResult.Ok);
             Assert.NotNull(refreshedAccess.Tokens);
             Assert.NotNull(refreshedAccess.Tokens.AccessToken);
-            Assert.Null(refreshedAccess.Tokens.RefreshToken.Value);
+            Assert.NotNull(refreshedAccess.Tokens.RefreshToken.Value);
             Assert.Equal(user.id, refreshedAccess.UserId);
 
             var identityOptions = new IdentityOptions();
